@@ -1,0 +1,34 @@
+{
+  "name": "email-exchange-competitor",
+  "version": "1.0.0",
+  "description": "Full-featured Microsoft Exchange competitor with advanced email security gateway",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "gateway",
+    "frontend",
+    "admin-dashboard"
+  ],
+  "scripts": {
+    "install-all": "npm install",
+    "build": "npm run build -w backend && npm run build -w gateway && npm run build -w frontend && npm run build -w admin-dashboard",
+    "dev": "npm run dev -w backend & npm run dev -w gateway & npm run dev -w frontend & npm run dev -w admin-dashboard",
+    "test": "npm test -w backend && npm test -w gateway",
+    "lint": "npm run lint -w backend && npm run lint -w gateway && npm run lint -w frontend",
+    "docker:build": "docker-compose -f deployment/docker/docker-compose.yml build",
+    "docker:up": "docker-compose -f deployment/docker/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f deployment/docker/docker-compose.yml down"
+  },
+  "keywords": [
+    "email",
+    "exchange",
+    "smtp",
+    "imap",
+    "pop3",
+    "security",
+    "gateway",
+    "spam-filter"
+  ],
+  "author": "Exchange Competitor Team",
+  "license": "MIT"
+}

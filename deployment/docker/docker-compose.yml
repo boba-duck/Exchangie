@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: email-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: emailserver
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: emailserver_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - email-network
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: email-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - email-network
+
+  # Email Server Backend
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: email-backend
+    ports:
+      - "3000:3000"
+      - "25:25"
+      - "143:143"
+      - "110:110"
+      - "587:587"
+      - "993:993"
+      - "995:995"
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: emailserver
+      DB_PASSWORD: changeme
+      DB_NAME: emailserver_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      HOSTNAME: mail.example.com
+      DOMAIN: example.com
+      SMTP_PORT: 25
+      IMAP_PORT: 143
+      POP3_PORT: 110
+      BACKEND_PORT: 3000
+      TLS_ENABLED: 'false'
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - email-network
+
+  # Email Gateway
+  gateway:
+    build:
+      context: ../gateway
+      dockerfile: Dockerfile
+    container_name: email-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      NODE_ENV: production
+      GATEWAY_PORT: 8080
+      LOG_LEVEL: info
+    networks:
+      - email-network
+
+  # Frontend (Webmail)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: email-webmail
+    ports:
+      - "3100:3100"
+    environment:
+      VITE_API_URL: http://localhost:3000
+    networks:
+      - email-network
+
+  # Admin Dashboard
+  admin-dashboard:
+    build:
+      context: ../admin-dashboard
+      dockerfile: Dockerfile
+    container_name: email-admin
+    ports:
+      - "3200:3200"
+    environment:
+      VITE_ADMIN_API_URL: http://localhost:3001
+    networks:
+      - email-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: email-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - backend
+      - gateway
+      - frontend
+      - admin-dashboard
+    networks:
+      - email-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  email-network:
+    driver: bridge
