@@ -95,7 +95,7 @@ A production-ready, full-featured Microsoft Exchange alternative with advanced e
 ```bash
 # Clone repository
 git clone https://github.com/boba-duck/Exchangie.git
-cd email-exchange-competitor
+cd Exchangie
 
 # Copy environment config
 cp .env.example .env
