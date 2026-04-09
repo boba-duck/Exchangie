@@ -94,7 +94,7 @@ A production-ready, full-featured Microsoft Exchange alternative with advanced e
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/email-exchange-competitor
+git clone https://github.com/boba-duck/Exchangie.git
 cd email-exchange-competitor
 
 # Copy environment config
@@ -404,7 +404,7 @@ For issues, questions, or suggestions:
 
 ## 👥 Credits
 
-Built by the Email Platform Team
+Built by Duck
 
 ---
 
